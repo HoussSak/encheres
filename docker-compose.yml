@@ -1,0 +1,31 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    restart: always
+    hostname: my-postgres
+    ports:
+      - "127.0.0.1:5431:5432"
+    environment:
+      - POSTGRES_DB=Enchere
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - PGDATA=/var/lib/posgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    hostname: my-pgadmin
+    ports:
+      - "81:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=houssem@admin.fr
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    links:
+      - "postgres:postgres-server" # use postgres-server as host for the server
+volumes:
+  postgres-data:
+    driver: local
+  pgadmin-data:
+    driver: local
