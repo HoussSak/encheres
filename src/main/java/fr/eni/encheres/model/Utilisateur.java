@@ -5,12 +5,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatusCode;
+import lombok.*;
 
 import java.util.List;
 
@@ -19,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
+@Builder
 @Table(name = "utilisateurs")
 public class Utilisateur extends AbstractEntity{
    private String pseudo;
@@ -27,7 +23,6 @@ public class Utilisateur extends AbstractEntity{
    private String telephone;
    @Embedded
    private Adresse adresse;
-   @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre, un caractère spécial et avoir une longueur minimale de 8 caractères.")
    private String motDePasse;
    private int credit;
    private boolean administrateur;

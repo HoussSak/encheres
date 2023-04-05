@@ -1,43 +1,57 @@
 package fr.eni.encheres.service.impl;
 
-import fr.eni.encheres.jwt.JwtController;
-import fr.eni.encheres.jwt.JwtFilter;
-import fr.eni.encheres.jwt.JwtUtils;
+import fr.eni.encheres.dto.UtilisateurDto;
 import fr.eni.encheres.model.Utilisateur;
 import fr.eni.encheres.repository.UserRepository;
 import fr.eni.encheres.service.UtilisateurService;
+import fr.eni.encheres.service.helper.UtilisateurServiceHelper;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 @Service
+@Slf4j
 public class UtilisateurServiceImpl implements UtilisateurService {
     private final UserRepository userRepository;
-    private final JwtController jwtController;
-    private final JwtUtils jwtUtils;
 
-    public UtilisateurServiceImpl(UserRepository userRepository, JwtController jwtController, JwtUtils jwtUtils) {
+    private final UtilisateurServiceHelper utilisateurServiceHelper;
+
+    public UtilisateurServiceImpl(UserRepository userRepository, UtilisateurServiceHelper utilisateurServiceHelper) {
         this.userRepository = userRepository;
-        this.jwtController = jwtController;
-        this.jwtUtils = jwtUtils;
+        this.utilisateurServiceHelper = utilisateurServiceHelper;
     }
 
     @Override
-    public Utilisateur saveUtilisateur(Utilisateur utilisateur) {
-        Utilisateur existingUser = userRepository.findOneByEmail(utilisateur.getEmail());
+    @Transactional
+    public Tuple2<UtilisateurDto,HttpHeaders> saveUtilisateur(UtilisateurDto utilisateurDto) {
+        Utilisateur existingUser = userRepository.findOneByEmail(utilisateurDto.getEmail());
         if(existingUser != null) {
+            log.error("found existing user with same email in the bdd: {}", utilisateurDto.getEmail());
             return null;
         }
+        Tuple2<UtilisateurDto,HttpHeaders> response =utilisateurServiceHelper.saveUtlisateur(utilisateurDto);
+        return Tuple.of(response._1,response._2);
+    }
 
-        Utilisateur user = new Utilisateur();
-        user.setEmail(utilisateur.getEmail());
-        user.setMotDePasse(new BCryptPasswordEncoder().encode(utilisateur.getMotDePasse()));
-        user.setNom(StringUtils.capitalize(utilisateur.getNom()));
-        user.setPseudo(StringUtils.capitalize(utilisateur.getPseudo()));
-        Utilisateur userSaved = userRepository.save(user);
-        return userSaved;
+    @Override
+    public UtilisateurDto findById(Integer id) {
+        if (id==null) {
+            log.error("Utilisateur ID is null");
+            return null;
+        }
+       return utilisateurServiceHelper.findById(id);
+    }
+    @Override
+    public List<UtilisateurDto> findAll() {
+        return utilisateurServiceHelper.readAllUsers();
+    }
+    @Override
+    public void delete(Integer id) {
+        utilisateurServiceHelper.delete(id);
     }
 }

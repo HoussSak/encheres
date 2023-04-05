@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
@@ -19,6 +20,7 @@ import java.time.Instant;
 @Table(name = "encheres")
 public class Enchere extends AbstractEntity{
     private Instant dateEnchere;
+    private BigDecimal montantEnchere;
     @ManyToOne
     @JoinColumn(name = "utilisateur_id")
     private Utilisateur UtilisateurEnchere;
