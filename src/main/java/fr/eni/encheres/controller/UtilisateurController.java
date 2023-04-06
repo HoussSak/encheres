@@ -70,6 +70,33 @@ public class UtilisateurController {
     public void deleteAccountByAdmin(@PathVariable("idUtilisateur") Integer id) {
         utilisateurService.deleteAccountByAdmin(id);
     }
+    @PatchMapping("/admin/update/{idUtilisateur}")
+    public ResponseEntity<ResponseUtilisateurDto> modifyUserByAdmin(@PathVariable("idUtilisateur") Integer id,
+                                                             @RequestBody CreateUtilisateurDto utilisateurDto,
+                                                             BindingResult result) {
+        List<String> errors = result.getFieldErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
+        if (!errors.isEmpty()) {
+            throw new InvalidEntityException("Utilisateur not valid", ErrorCodes.UTILISATEUR_NOT_VALID, errors);
+        }
+        log.info("Updating user with id: {}", id);
+        ResponseUtilisateurDto userSaved = utilisateurService.updateUtilisateur(utilisateurDto,id);
+        return new ResponseEntity<>(userSaved, HttpStatus.OK);
+    }
+    @PatchMapping("/update")
+    public ResponseEntity<ResponseUtilisateurDto> modifyUser(Principal principal,
+                                                             @RequestBody CreateUtilisateurDto utilisateurDto,
+                                                             BindingResult result) {
+        List<String> errors = result.getFieldErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
+        if (!errors.isEmpty()) {
+            throw new InvalidEntityException("Utilisateur not valid", ErrorCodes.UTILISATEUR_NOT_VALID, errors);
+        }
+        ResponseUtilisateurDto userSaved = utilisateurService.updateUtilisateurByAdmin(utilisateurDto,principal);
+        return new ResponseEntity<>(userSaved, HttpStatus.OK);
+    }
 
 
 }

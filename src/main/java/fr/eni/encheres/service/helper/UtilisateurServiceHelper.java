@@ -78,4 +78,23 @@ public class UtilisateurServiceHelper {
                 .map(UtilisateurMapper::utilisateurToUtilisateurDtoResponse).
                 collect(Collectors.toList());
     }
+    @Transactional
+    public ResponseUtilisateurDto updateUser(CreateUtilisateurDto utilisateurDto,Integer id ) {
+        Optional<Utilisateur> optionalUser = userRepository.findById(id);
+        Utilisateur foundUser = optionalUser.orElseThrow(() -> new EntityNotFoundException("Utilisateur with ID = " + id + " not found", ErrorCodes.UTILISATEUR_NOT_FOUND));
+        Utilisateur updatedUser = UtilisateurMapper.updateUpate(utilisateurDto,foundUser);
+        Utilisateur savedUser = userRepository.save(updatedUser);
+        log.info("User with ID = {} is updated", savedUser.getId());
+        return UtilisateurMapper.utilisateurToUtilisateurDtoResponse(savedUser);
+    }
+
+    public ResponseUtilisateurDto updateUserByAdmin(CreateUtilisateurDto utilisateurDto, Principal principal) {
+        Integer id =  utilisateurConnecte.getUserConnectedId(principal);
+        Optional<Utilisateur> optionalUser = userRepository.findById(id);
+        Utilisateur foundUser = optionalUser.orElseThrow(() -> new EntityNotFoundException("Utilisateur with ID = " + id + " not found", ErrorCodes.UTILISATEUR_NOT_FOUND));
+        Utilisateur updatedUser = UtilisateurMapper.updateUpate(utilisateurDto,foundUser);
+        Utilisateur savedUser = userRepository.save(updatedUser);
+        log.info("User with ID = {} is updated", savedUser.getId());
+        return UtilisateurMapper.utilisateurToUtilisateurDtoResponse(savedUser);
+    }
 }

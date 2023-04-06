@@ -57,4 +57,16 @@ public class UtilisateurMapper {
                 .administrateur(utilisateur.isAdministrateur())
                 .build();
     }
+
+    public static Utilisateur updateUpate(CreateUtilisateurDto utilisateurDto, Utilisateur foundUser) {
+        return Utilisateur.builder()
+                .id(foundUser.getId())
+                .nom(StringUtils.capitalize(utilisateurDto.getNom()))
+                .pseudo(StringUtils.capitalize(utilisateurDto.getPseudo()))
+                .email(utilisateurDto.getEmail())
+                .adresse(utilisateurDto.getAdresse())
+                .telephone(utilisateurDto.getTelephone())
+                .motDePasse(new BCryptPasswordEncoder().encode(utilisateurDto.getMotDePasse()))
+                .build();
+    }
 }

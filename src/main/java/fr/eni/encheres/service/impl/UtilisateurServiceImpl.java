@@ -2,8 +2,6 @@ package fr.eni.encheres.service.impl;
 
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
 import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
-import fr.eni.encheres.exception.ErrorCodes;
-import fr.eni.encheres.exception.InvalidEntityException;
 import fr.eni.encheres.model.Utilisateur;
 import fr.eni.encheres.repository.UserRepository;
 import fr.eni.encheres.service.UtilisateurService;
@@ -66,5 +64,15 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     @Override
     public void deleteAccountByAdmin(Integer id) {
         utilisateurServiceHelper.deleteAccount(id);
+    }
+
+    @Override
+    public ResponseUtilisateurDto updateUtilisateur(CreateUtilisateurDto utilisateurDto, Integer id) {
+        return utilisateurServiceHelper.updateUser(utilisateurDto,id);
+    }
+
+    @Override
+    public ResponseUtilisateurDto updateUtilisateurByAdmin(CreateUtilisateurDto utilisateurDto, Principal principal) {
+        return utilisateurServiceHelper.updateUserByAdmin(utilisateurDto,principal);
     }
 }
