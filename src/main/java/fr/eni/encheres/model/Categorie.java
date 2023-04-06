@@ -13,9 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "categories")
+@Table(name = "CATEGORIES")
 public class Categorie extends AbstractEntity {
     private String libelle;
-    @OneToMany(mappedBy = "articleCategorie")
+    @OneToMany(mappedBy = "categorie")
     private List<ArticleVendu> articles;
 }

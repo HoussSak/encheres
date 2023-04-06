@@ -3,5 +3,5 @@ spring:
     defer-datasource-initialization: true
     show-sql: true
 server:
-  port: 8881
+  port: 8888
 

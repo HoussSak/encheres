@@ -1,39 +1,44 @@
 package fr.eni.encheres.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "articlevendus")
-public class ArticleVendu extends AbstractEntity {
+@Builder
+@Table(name = "ARTICLES_VENDUS")
+public class ArticleVendu {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "no_article")
+    private Integer noArticle;
+    @Column(name = "nom_article")
     private String nomArticle;
     private String description;
+    @Column(name = "date_debut_encheres")
     private Instant dateDebutEncheres;
+    @Column(name = "date_fin_encheres")
     private Instant dateFinEncheres;
+    @Column(name = "prix_initial")
     private BigDecimal prixInitial;
+    @Column(name = "prix_vente")
     private BigDecimal prixVente;
     @ManyToOne
-    @JoinColumn(name = "acheteur_id")
-    private Utilisateur acheteur;
+    @JoinColumn(name = "no_utilisateur")
+    private Utilisateur utilisateur;
     @ManyToOne
-    @JoinColumn(name = "vendeur_id")
-    private Utilisateur vendeur;
-    @ManyToOne
-    @JoinColumn(name = "categorie_id")
-    private Categorie articleCategorie;
+    @JoinColumn(name = "no_categorie")
+    private Categorie categorie;;
     @OneToOne(mappedBy = "articleVendu",cascade = CascadeType.ALL,optional = true)
     private Retrait retrait;
-    @OneToOne(mappedBy = "articleVendu",cascade = CascadeType.ALL,optional = true)
-    private Enchere enchere;
+    @OneToMany(mappedBy = "articleVendu")
+    private List<Enchere> encheres = new ArrayList<>();
 
 }

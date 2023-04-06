@@ -1,6 +1,6 @@
 package fr.eni.encheres.service.impl;
 
-import fr.eni.encheres.dto.UtilisateurDto;
+import fr.eni.encheres.dto.create.CreateUtilisateurDto;
 import fr.eni.encheres.model.Utilisateur;
 import fr.eni.encheres.repository.UserRepository;
 import fr.eni.encheres.service.UtilisateurService;
@@ -28,18 +28,18 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     @Override
     @Transactional
-    public Tuple2<UtilisateurDto,HttpHeaders> saveUtilisateur(UtilisateurDto utilisateurDto) {
+    public Tuple2<CreateUtilisateurDto,HttpHeaders> saveUtilisateur(CreateUtilisateurDto utilisateurDto) {
         Utilisateur existingUser = userRepository.findOneByEmail(utilisateurDto.getEmail());
         if(existingUser != null) {
             log.error("found existing user with same email in the bdd: {}", utilisateurDto.getEmail());
             return null;
         }
-        Tuple2<UtilisateurDto,HttpHeaders> response =utilisateurServiceHelper.saveUtlisateur(utilisateurDto);
+        Tuple2<CreateUtilisateurDto,HttpHeaders> response =utilisateurServiceHelper.saveUtlisateur(utilisateurDto);
         return Tuple.of(response._1,response._2);
     }
 
     @Override
-    public UtilisateurDto findById(Integer id) {
+    public CreateUtilisateurDto findById(Integer id) {
         if (id==null) {
             log.error("Utilisateur ID is null");
             return null;
@@ -47,7 +47,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
        return utilisateurServiceHelper.findById(id);
     }
     @Override
-    public List<UtilisateurDto> findAll() {
+    public List<CreateUtilisateurDto> findAll() {
         return utilisateurServiceHelper.readAllUsers();
     }
     @Override

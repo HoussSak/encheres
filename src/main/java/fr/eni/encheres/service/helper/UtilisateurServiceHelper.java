@@ -1,6 +1,6 @@
 package fr.eni.encheres.service.helper;
 
-import fr.eni.encheres.dto.UtilisateurDto;
+import fr.eni.encheres.dto.create.CreateUtilisateurDto;
 import fr.eni.encheres.exception.EntityNotFoundException;
 import fr.eni.encheres.exception.ErrorCodes;
 import fr.eni.encheres.jwt.JwtController;
@@ -37,19 +37,19 @@ public class UtilisateurServiceHelper {
         this.jwtUtils = jwtUtils;
     }
     @Transactional
-    public Tuple2<UtilisateurDto, HttpHeaders> saveUtlisateur(UtilisateurDto utilisateurDto) {
-        Utilisateur sevedUser = userRepository.save(utilisateurMapper.UtilisateurDtoToUtilisateur(utilisateurDto));
-        log.info("User is created with id: {}", utilisateurDto.getId());
-        UtilisateurDto user = utilisateurMapper.UtilisateurToUtilisateurDto(sevedUser);
+    public Tuple2<CreateUtilisateurDto, HttpHeaders> saveUtlisateur(CreateUtilisateurDto utilisateurDto) {
+        Utilisateur savedUser = userRepository.save(utilisateurMapper.UtilisateurDtoToUtilisateur(utilisateurDto));
+        log.info("User is created with id: {}", savedUser.getId());
+        CreateUtilisateurDto user = UtilisateurMapper.UtilisateurToUtilisateurDto(savedUser);
         Authentication authentication = jwtController.logUser(utilisateurDto.getEmail(), utilisateurDto.getMotDePasse());
         String jwt = jwtUtils.generateToken(authentication);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         return Tuple.of(user,httpHeaders);
     }
-    public UtilisateurDto findById(Integer id) {
+    public CreateUtilisateurDto findById(Integer id) {
         Optional<Utilisateur> utilisateur = userRepository.findById(id);
-        UtilisateurDto utilisateurDto = UtilisateurMapper.UtilisateurToUtilisateurDto(utilisateur.get());
+        CreateUtilisateurDto utilisateurDto = UtilisateurMapper.UtilisateurToUtilisateurDto(utilisateur.get());
         return Optional.of(utilisateurDto).orElseThrow(()->
                 new EntityNotFoundException("Utilisateur with ID = "+id+" not found", ErrorCodes.UTILISATEUR_NOT_FOUND));
     }
@@ -61,7 +61,7 @@ public class UtilisateurServiceHelper {
         userRepository.deleteById(id);
     }
 
-    public List<UtilisateurDto> readAllUsers() {
+    public List<CreateUtilisateurDto> readAllUsers() {
         return userRepository.findAll().stream()
                 .map(UtilisateurMapper::UtilisateurToUtilisateurDto).
                 collect(Collectors.toList());

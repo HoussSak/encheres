@@ -1,7 +1,7 @@
 package fr.eni.encheres.controller;
 
 
-import fr.eni.encheres.dto.UtilisateurDto;
+import fr.eni.encheres.dto.create.CreateUtilisateurDto;
 import fr.eni.encheres.exception.ErrorCodes;
 import fr.eni.encheres.exception.InvalidEntityException;
 import fr.eni.encheres.service.UtilisateurService;
@@ -29,7 +29,7 @@ public class UtilisateurController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UtilisateurDto> signup(@RequestBody UtilisateurDto utilisateurDto, BindingResult result) {
+    public ResponseEntity<CreateUtilisateurDto> signup(@RequestBody CreateUtilisateurDto utilisateurDto, BindingResult result) {
         List<String> errors = result.getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
@@ -37,7 +37,7 @@ public class UtilisateurController {
             throw  new InvalidEntityException("Utilisateur not valid", ErrorCodes.UTILISATEUR_NOT_VALID,errors);
         }
         log.info("Creating new user for with email: {}", utilisateurDto.getEmail());
-                Tuple2<UtilisateurDto, HttpHeaders> userSaved = utilisateurService.saveUtilisateur(utilisateurDto);
+                Tuple2<CreateUtilisateurDto, HttpHeaders> userSaved = utilisateurService.saveUtilisateur(utilisateurDto);
         return new ResponseEntity<>(userSaved._1, userSaved._2, HttpStatus.OK);
     }
     @GetMapping(value = "/isConnected")

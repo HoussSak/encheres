@@ -1,21 +1,19 @@
 package fr.eni.encheres.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "retraits")
+@Builder
+@Table(name = "RETRAITS")
 public class Retrait extends AbstractEntity {
     @Embedded
     private Adresse adresse;
     @OneToOne
-    @JoinColumn(name = "article_vendu_id",unique = true)
+    @JoinColumn(name = "article_vendu_id")
     private ArticleVendu articleVendu;
 }
