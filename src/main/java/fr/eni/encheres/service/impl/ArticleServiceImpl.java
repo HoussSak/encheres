@@ -4,7 +4,9 @@ import fr.eni.encheres.common.UtilisateurConnecte;
 import fr.eni.encheres.dto.create.CreateArticleVenduDto;
 import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
 import fr.eni.encheres.mapper.ArticleVenduMapper;
+import fr.eni.encheres.mapper.UtilisateurMapper;
 import fr.eni.encheres.model.ArticleVendu;
+import fr.eni.encheres.model.Categorie;
 import fr.eni.encheres.model.Retrait;
 import fr.eni.encheres.model.Utilisateur;
 import fr.eni.encheres.repository.ArticleVenduRepository;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,9 +46,23 @@ public class ArticleServiceImpl implements ArticleVenduService {
         Optional<Utilisateur> existingUser = userRepository.findById(actualUserId);
         articleVendu.setUtilisateur(existingUser.get());
         articleVendu.setRetrait(getRetraitByDefault(articleVendu,existingUser.get()));
+        articleVendu.setCategorie(articleVendu.getCategorie());
         ArticleVendu savedArticle = articleVenduRepository.save(articleVendu);
         return ArticleVenduMapper.articleVenduToArticleVenduDto(savedArticle);
     }
+
+    @Override
+    public ResponseArticleVenduDto updateArticle(CreateArticleVenduDto articleVenduDto, Integer id) {
+        if (id==null) {
+            log.error("article ID is null");
+            return null;
+        }
+        Optional<ArticleVendu> existingArticle = articleVenduRepository.findById(id);
+        ArticleVendu articleVendu = ArticleVenduMapper.updateArticle(articleVenduDto,existingArticle.get());
+        ArticleVendu savedArticle = articleVenduRepository.save(articleVendu);
+        return ArticleVenduMapper.articleVenduToArticleVenduDto(savedArticle);
+    }
+
 
     private Retrait getRetraitByDefault(ArticleVendu savedArticle, Utilisateur utilisateur) {
         return Retrait.builder()

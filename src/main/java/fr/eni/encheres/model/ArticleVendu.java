@@ -34,7 +34,7 @@ public class ArticleVendu {
     @JoinColumn(name = "no_utilisateur")
     private Utilisateur utilisateur;
     @ManyToOne
-    @JoinColumn(name = "no_categorie")
+    @JoinColumn(name = "categorie")
     private Categorie categorie;;
     @OneToOne(mappedBy = "articleVendu",cascade = CascadeType.ALL,optional = true)
     private Retrait retrait;

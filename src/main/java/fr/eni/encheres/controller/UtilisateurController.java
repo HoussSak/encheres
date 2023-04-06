@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,7 +50,7 @@ public class UtilisateurController {
         log.info("processing finding user by id: {}", id);
         return new ResponseEntity<>(utilisateurService.findById(id),HttpStatus.OK) ;
     }
-    @GetMapping("/all")
+    @GetMapping(value = "/all",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ResponseUtilisateurDto>> findAllUsers() {
         log.info("processing finding all users");
         return new ResponseEntity<>(utilisateurService.findAll(),HttpStatus.OK) ;

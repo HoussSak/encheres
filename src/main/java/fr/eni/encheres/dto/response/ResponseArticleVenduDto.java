@@ -22,6 +22,5 @@ public class ResponseArticleVenduDto {
     private String  articleCategorie;
     @Embedded
     private AdresseDto retrait;
-    private ResponseUtilisateurDto vendeur;
 
 }

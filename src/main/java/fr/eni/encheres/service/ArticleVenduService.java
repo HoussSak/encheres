@@ -8,4 +8,5 @@ import java.security.Principal;
 
 public interface ArticleVenduService {
         ResponseArticleVenduDto saveArticle(@Valid CreateArticleVenduDto articleVenduDto, Principal principal);
+        ResponseArticleVenduDto updateArticle(@Valid CreateArticleVenduDto articleVenduDto, Integer principal);
 }

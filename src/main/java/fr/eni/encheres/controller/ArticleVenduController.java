@@ -11,10 +11,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -42,6 +39,19 @@ public class ArticleVenduController {
         }
         log.info("Creating new article: {}", articleVenduDto.getNomArticle());
         ResponseArticleVenduDto savedArticle = articleVenduService.saveArticle(articleVenduDto, principal);
+        return new ResponseEntity<>(savedArticle, HttpStatus.OK);
+    }
+    @PatchMapping("/update/{idArticle}")
+    public ResponseEntity<ResponseArticleVenduDto> UpdateArticle(@RequestBody CreateArticleVenduDto articleVenduDto,@PathVariable("idArticle") Integer id,
+                                                                 BindingResult result) {
+        List<String> errors = result.getFieldErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
+        if (!errors.isEmpty()) {
+            throw  new InvalidEntityException("Article not valid not valid", ErrorCodes.ARTICLE_NOT_VALID,errors);
+        }
+        log.info("Updating article with id: {}", id);
+        ResponseArticleVenduDto savedArticle = articleVenduService.updateArticle(articleVenduDto, id);
         return new ResponseEntity<>(savedArticle, HttpStatus.OK);
     }
 

@@ -11,11 +11,12 @@ import java.time.Instant;
 @Data
 @Builder
 public class CreateArticleVenduDto {
-    private Integer id;
     @NotBlank(message = "Veuillez renseigner le nom de l'article")
     private String nomArticle;
     @NotBlank(message = "Veuillez renseigner le nom de la déscription")
     private String description;
+    @NotBlank(message = "Veuillez renseigner une catégorie")
+    private Categorie articleCategorie;
     @NotBlank(message = "Veuillez renseigner la date de début")
     private Instant dateDebutEncheres;
     @NotBlank(message = "Veuillez renseigner la date de fin")
@@ -24,12 +25,9 @@ public class CreateArticleVenduDto {
     private BigDecimal prixInitial;
     private BigDecimal prixVente;
     @JsonIgnore
-    private Utilisateur acheteur;
-    @JsonIgnore
     private Utilisateur vendeur;
-    @JsonIgnore
 
-    private Categorie articleCategorie;
+
     @JsonIgnore
     private Retrait retrait;
     @JsonIgnore

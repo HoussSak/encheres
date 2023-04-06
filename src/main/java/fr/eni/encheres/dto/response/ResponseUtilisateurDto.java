@@ -25,7 +25,7 @@ public class ResponseUtilisateurDto {
     @Embedded
     private Adresse adresse;
     private boolean administrateur;
-    private List<ArticleVendu> articles;
+    private List<ResponseArticleVenduDto> articles;
     @JsonIgnore
     private List<Enchere> encheres;
 

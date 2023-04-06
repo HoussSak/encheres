@@ -6,6 +6,8 @@ import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
 import fr.eni.encheres.model.ArticleVendu;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class ArticleVenduMapper {
     public static ArticleVendu articleVenduDtoToArticleVendu(CreateArticleVenduDto articleVenduDto){
@@ -15,6 +17,7 @@ public class ArticleVenduMapper {
                 .prixInitial(articleVenduDto.getPrixInitial())
                 .dateDebutEncheres(articleVenduDto.getDateDebutEncheres())
                 .dateFinEncheres(articleVenduDto.getDateFinEncheres())
+                .categorie(articleVenduDto.getArticleCategorie())
                 .build();
     }
     public static ResponseArticleVenduDto articleVenduToArticleVenduDto(ArticleVendu articleVendu){
@@ -30,8 +33,20 @@ public class ArticleVenduMapper {
                         .codePostal(articleVendu.getRetrait().getAdresse().getCodePostal())
                         .ville(articleVendu.getRetrait().getAdresse().getVille())
                         .build())
-                .articleCategorie("Velo")
-                .vendeur(UtilisateurMapper.utilisateurToUtilisateurDtoResponse(articleVendu.getUtilisateur()))
+                .articleCategorie(articleVendu.getCategorie().getLibelle())
+                .build();
+    }
+
+    public static ArticleVendu updateArticle(CreateArticleVenduDto articleVenduDto, ArticleVendu existingArticle) {
+        return ArticleVendu.builder()
+                .noArticle(existingArticle.getNoArticle())
+                .nomArticle(articleVenduDto.getNomArticle())
+                .description(articleVenduDto.getDescription())
+                .prixInitial(articleVenduDto.getPrixInitial())
+                .dateDebutEncheres(articleVenduDto.getDateDebutEncheres())
+                .dateFinEncheres(articleVenduDto.getDateFinEncheres())
+                .categorie(articleVenduDto.getArticleCategorie())
+                .retrait(existingArticle.getRetrait())
                 .build();
     }
 }
