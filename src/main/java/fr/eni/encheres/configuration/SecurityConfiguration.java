@@ -34,6 +34,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/index.html").permitAll()
                         .requestMatchers("/static/**").permitAll()
                         .requestMatchers("/users/signup").permitAll()
+                        .requestMatchers("/articles/all").permitAll()
+                        .requestMatchers("/categories/all").permitAll()
                         .requestMatchers("/authenticate").permitAll()
                         .requestMatchers("/users/isConnected").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()

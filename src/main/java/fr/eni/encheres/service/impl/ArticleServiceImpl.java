@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -61,6 +62,13 @@ public class ArticleServiceImpl implements ArticleVenduService {
         ArticleVendu articleVendu = ArticleVenduMapper.updateArticle(articleVenduDto,existingArticle.get());
         ArticleVendu savedArticle = articleVenduRepository.save(articleVendu);
         return ArticleVenduMapper.articleVenduToArticleVenduDto(savedArticle);
+    }
+
+    @Override
+    public List<ResponseArticleVenduDto> findAllArticles() {
+        return articleVenduRepository.findAll().stream()
+                .map(ArticleVenduMapper::articleVenduToArticleVenduDto)
+                .collect(Collectors.toList());
     }
 
 

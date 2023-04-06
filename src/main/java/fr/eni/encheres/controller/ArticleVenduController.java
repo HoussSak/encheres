@@ -54,5 +54,10 @@ public class ArticleVenduController {
         ResponseArticleVenduDto savedArticle = articleVenduService.updateArticle(articleVenduDto, id);
         return new ResponseEntity<>(savedArticle, HttpStatus.OK);
     }
+    @GetMapping("/all")
+    public ResponseEntity<List<ResponseArticleVenduDto>> getAll() {
+        log.info("Processing finding all articles");
+       return new ResponseEntity<> (articleVenduService.findAllArticles(),HttpStatus.OK);
+    }
 
 }
