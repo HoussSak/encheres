@@ -20,6 +20,7 @@ public class ResponseUtilisateurDto {
     private Integer id;
     private String pseudo;
     private String nom;
+    private String prenom;
     private String email;
     private String telephone;
     @Embedded

@@ -20,6 +20,8 @@ public class CreateUtilisateurDto {
     private String pseudo;
     @NotBlank(message = "Veuillez renseigner le nom")
     private String nom;
+    @NotBlank(message = "Veuillez renseigner le prenom")
+    private String prenom;
     @NotBlank(message = "Veuillez renseigner l''adresse mail")
     @Email(message = "Veuillez saisir une adresse electronique correcte")
     private String email;

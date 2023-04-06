@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,14 +54,17 @@ public class UtilisateurMapper {
     }
 
     private static List<ResponseArticleVenduDto> getArticles(Utilisateur utilisateur) {
+        if (utilisateur.getArticles() == null) {
+            return List.of();
+        }
        return utilisateur.getArticles().stream().map(ArticleVenduMapper::articleVenduToArticleVenduDto
                 ).collect(Collectors.toList());
     }
-
     public static ResponseUtilisateurDto createUtilisateurToUtilisateurDtoResponse(CreateUtilisateurDto utilisateur) {
         return ResponseUtilisateurDto.builder()
                 .id(utilisateur.getId())
                 .nom(utilisateur.getNom())
+                .prenom(utilisateur.getPrenom())
                 .pseudo(utilisateur.getPseudo())
                 .email(utilisateur.getEmail())
                 .adresse(utilisateur.getAdresse())
@@ -68,11 +72,11 @@ public class UtilisateurMapper {
                 .administrateur(utilisateur.isAdministrateur())
                 .build();
     }
-
     public static Utilisateur updateUpate(CreateUtilisateurDto utilisateurDto, Utilisateur foundUser) {
         return Utilisateur.builder()
                 .id(foundUser.getId())
                 .nom(StringUtils.capitalize(utilisateurDto.getNom()))
+                .prenom(StringUtils.capitalize(utilisateurDto.getPrenom()))
                 .pseudo(StringUtils.capitalize(utilisateurDto.getPseudo()))
                 .email(utilisateurDto.getEmail())
                 .adresse(utilisateurDto.getAdresse())
