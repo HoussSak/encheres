@@ -1,6 +1,7 @@
 package fr.eni.encheres.mapper;
 
-import fr.eni.encheres.dto.UtilisateurDto;
+import fr.eni.encheres.dto.create.CreateUtilisateurDto;
+import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
 import fr.eni.encheres.model.Utilisateur;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -8,7 +9,7 @@ import org.springframework.util.StringUtils;
 
 @Component
 public class UtilisateurMapper {
-    public Utilisateur UtilisateurDtoToUtilisateur(UtilisateurDto utilisateurDto) {
+    public static Utilisateur UtilisateurDtoToUtilisateur(CreateUtilisateurDto utilisateurDto) {
         return Utilisateur.builder()
                 .nom(StringUtils.capitalize(utilisateurDto.getNom()))
                 .pseudo(StringUtils.capitalize(utilisateurDto.getPseudo()))
@@ -18,12 +19,11 @@ public class UtilisateurMapper {
                 .motDePasse(new BCryptPasswordEncoder().encode(utilisateurDto.getMotDePasse()))
                 .credit(utilisateurDto.getCredit())
                 .administrateur(utilisateurDto.isAdministrateur())
-                .achete(utilisateurDto.getAchete())
-                .vend(utilisateurDto.getVend())
+                .articles(utilisateurDto.getArticles())
                 .build();
     }
-    public static UtilisateurDto UtilisateurToUtilisateurDto(Utilisateur utilisateur) {
-        return UtilisateurDto.builder()
+    public static CreateUtilisateurDto UtilisateurToUtilisateurDto(Utilisateur utilisateur) {
+        return CreateUtilisateurDto.builder()
                 .id(utilisateur.getId())
                 .nom(utilisateur.getNom())
                 .pseudo(utilisateur.getPseudo())
@@ -32,8 +32,18 @@ public class UtilisateurMapper {
                 .telephone(utilisateur.getTelephone())
                 .credit(utilisateur.getCredit())
                 .administrateur(utilisateur.isAdministrateur())
-                .achete(utilisateur.getAchete())
-                .vend(utilisateur.getVend())
+                .build();
+    }
+
+    public static ResponseUtilisateurDto UtilisateurToUtilisateurDtoResponse(Utilisateur utilisateur) {
+        return ResponseUtilisateurDto.builder()
+                .id(utilisateur.getId())
+                .nom(utilisateur.getNom())
+                .pseudo(utilisateur.getPseudo())
+                .email(utilisateur.getEmail())
+                .adresse(utilisateur.getAdresse())
+                .telephone(utilisateur.getTelephone())
+                .administrateur(utilisateur.isAdministrateur())
                 .build();
     }
 }

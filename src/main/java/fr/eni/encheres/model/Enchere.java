@@ -1,9 +1,6 @@
 package fr.eni.encheres.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,20 +8,26 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EqualsAndHashCode(callSuper = true)
 @Table(name = "encheres")
-public class Enchere extends AbstractEntity{
-    private Instant dateEnchere;
-    private BigDecimal montantEnchere;
+public class Enchere{
+    @EmbeddedId
+    private EnchereId id;
+    @Column(name = "date_enchere")
+    private LocalDateTime dateEnchere;
+    @Column(name = "montant_enchere")
+    private Integer montantEnchere;
     @ManyToOne
-    @JoinColumn(name = "utilisateur_id")
-    private Utilisateur UtilisateurEnchere;
+    @MapsId("utilisateurId")
+    @JoinColumn(name = "no_utilisateur")
+    private Utilisateur utilisateur;
     @ManyToOne
-    @JoinColumn(name = "article_vendu_id")
+    @MapsId("articleId")
+    @JoinColumn(name = "no_article")
     private ArticleVendu articleVendu;
 }
