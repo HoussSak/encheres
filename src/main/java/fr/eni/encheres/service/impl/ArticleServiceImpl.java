@@ -13,6 +13,7 @@ import fr.eni.encheres.repository.UserRepository;
 import fr.eni.encheres.service.ArticleVenduService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.Optional;
@@ -35,14 +36,15 @@ public class ArticleServiceImpl implements ArticleVenduService {
     }
 
     @Override
+    @Transactional
     public ResponseArticleVenduDto saveArticle(CreateArticleVenduDto articleVenduDto, Principal principal) {
-        ArticleVendu articleVendu = articleVenduMapper.articleVenduDtoToArticleVendu(articleVenduDto);
+        ArticleVendu articleVendu = ArticleVenduMapper.articleVenduDtoToArticleVendu(articleVenduDto);
         Integer actualUserId =  utilisateurConnecte.getUserConnectedId(principal);
         Optional<Utilisateur> existingUser = userRepository.findById(actualUserId);
         articleVendu.setUtilisateur(existingUser.get());
         articleVendu.setRetrait(getRetraitByDefault(articleVendu,existingUser.get()));
         ArticleVendu savedArticle = articleVenduRepository.save(articleVendu);
-        return articleVenduMapper.articleVenduToArticleVenduDto(savedArticle);
+        return ArticleVenduMapper.articleVenduToArticleVenduDto(savedArticle);
     }
 
     private Retrait getRetraitByDefault(ArticleVendu savedArticle, Utilisateur utilisateur) {

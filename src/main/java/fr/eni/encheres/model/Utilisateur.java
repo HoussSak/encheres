@@ -27,10 +27,10 @@ public class Utilisateur {
    private String motDePasse;
    private Integer credit;
    private boolean administrateur;
-   @OneToMany(mappedBy = "utilisateur")
+   @OneToMany(mappedBy = "utilisateur",cascade = CascadeType.ALL)
    @JsonIgnore
    private List<ArticleVendu> articles;
-   @OneToMany(mappedBy = "utilisateur")
+   @OneToMany(mappedBy = "utilisateur",cascade = CascadeType.ALL)
    @JsonIgnore
    private List<Enchere> encheres;
 

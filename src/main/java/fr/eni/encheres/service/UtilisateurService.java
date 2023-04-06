@@ -1,19 +1,22 @@
 package fr.eni.encheres.service;
 
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
+import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
 import io.vavr.Tuple2;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface UtilisateurService {
-    Tuple2<CreateUtilisateurDto, HttpHeaders> saveUtilisateur(@Valid CreateUtilisateurDto utilisateurDto);
-    CreateUtilisateurDto findById(Integer id);
+    Tuple2<ResponseUtilisateurDto, HttpHeaders> saveUtilisateur(@Valid CreateUtilisateurDto utilisateurDto);
+    ResponseUtilisateurDto findById(Integer id);
 
-    List<CreateUtilisateurDto> findAll();
+    List<ResponseUtilisateurDto> findAll();
 
-    void delete(Integer id);
+    void delete(Principal principal);
+    void deleteAccountByAdmin(Integer id);
 }
 
 

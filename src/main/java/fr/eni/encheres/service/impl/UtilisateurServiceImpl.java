@@ -1,6 +1,9 @@
 package fr.eni.encheres.service.impl;
 
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
+import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
+import fr.eni.encheres.exception.ErrorCodes;
+import fr.eni.encheres.exception.InvalidEntityException;
 import fr.eni.encheres.model.Utilisateur;
 import fr.eni.encheres.repository.UserRepository;
 import fr.eni.encheres.service.UtilisateurService;
@@ -12,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -28,18 +32,22 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     @Override
     @Transactional
-    public Tuple2<CreateUtilisateurDto,HttpHeaders> saveUtilisateur(CreateUtilisateurDto utilisateurDto) {
+    public Tuple2<ResponseUtilisateurDto,HttpHeaders> saveUtilisateur(CreateUtilisateurDto utilisateurDto) {
         Utilisateur existingUser = userRepository.findOneByEmail(utilisateurDto.getEmail());
         if(existingUser != null) {
             log.error("found existing user with same email in the bdd: {}", utilisateurDto.getEmail());
             return null;
         }
-        Tuple2<CreateUtilisateurDto,HttpHeaders> response =utilisateurServiceHelper.saveUtlisateur(utilisateurDto);
+        Tuple2<ResponseUtilisateurDto,HttpHeaders> response =utilisateurServiceHelper.saveUtlisateur(utilisateurDto);
+        if(response == null) {
+            log.error("Veuillez renseigner tous les champs correctement: {}", utilisateurDto.getEmail());
+            return null;
+        }
         return Tuple.of(response._1,response._2);
     }
 
     @Override
-    public CreateUtilisateurDto findById(Integer id) {
+    public ResponseUtilisateurDto findById(Integer id) {
         if (id==null) {
             log.error("Utilisateur ID is null");
             return null;
@@ -47,11 +55,16 @@ public class UtilisateurServiceImpl implements UtilisateurService {
        return utilisateurServiceHelper.findById(id);
     }
     @Override
-    public List<CreateUtilisateurDto> findAll() {
+    public List<ResponseUtilisateurDto> findAll() {
         return utilisateurServiceHelper.readAllUsers();
     }
     @Override
-    public void delete(Integer id) {
-        utilisateurServiceHelper.delete(id);
+    public void delete(Principal principal) {
+        utilisateurServiceHelper.delete(principal);
+    }
+
+    @Override
+    public void deleteAccountByAdmin(Integer id) {
+        utilisateurServiceHelper.deleteAccount(id);
     }
 }

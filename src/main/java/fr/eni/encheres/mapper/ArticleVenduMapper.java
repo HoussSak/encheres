@@ -31,7 +31,7 @@ public class ArticleVenduMapper {
                         .ville(articleVendu.getRetrait().getAdresse().getVille())
                         .build())
                 .articleCategorie("Velo")
-                .vendeur(UtilisateurMapper.UtilisateurToUtilisateurDtoResponse(articleVendu.getUtilisateur()))
+                .vendeur(UtilisateurMapper.utilisateurToUtilisateurDtoResponse(articleVendu.getUtilisateur()))
                 .build();
     }
 }

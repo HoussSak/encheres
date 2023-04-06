@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
 
 @Component
 public class UtilisateurMapper {
-    public static Utilisateur UtilisateurDtoToUtilisateur(CreateUtilisateurDto utilisateurDto) {
+    public static Utilisateur createUtilisateurDtoToUtilisateur(CreateUtilisateurDto utilisateurDto) {
         return Utilisateur.builder()
                 .nom(StringUtils.capitalize(utilisateurDto.getNom()))
                 .pseudo(StringUtils.capitalize(utilisateurDto.getPseudo()))
@@ -22,7 +22,7 @@ public class UtilisateurMapper {
                 .articles(utilisateurDto.getArticles())
                 .build();
     }
-    public static CreateUtilisateurDto UtilisateurToUtilisateurDto(Utilisateur utilisateur) {
+    public static CreateUtilisateurDto utilisateurToCreateUtilisateurDto(Utilisateur utilisateur) {
         return CreateUtilisateurDto.builder()
                 .id(utilisateur.getId())
                 .nom(utilisateur.getNom())
@@ -35,7 +35,18 @@ public class UtilisateurMapper {
                 .build();
     }
 
-    public static ResponseUtilisateurDto UtilisateurToUtilisateurDtoResponse(Utilisateur utilisateur) {
+    public static ResponseUtilisateurDto utilisateurToUtilisateurDtoResponse(Utilisateur utilisateur) {
+        return ResponseUtilisateurDto.builder()
+                .id(utilisateur.getId())
+                .nom(utilisateur.getNom())
+                .pseudo(utilisateur.getPseudo())
+                .email(utilisateur.getEmail())
+                .adresse(utilisateur.getAdresse())
+                .telephone(utilisateur.getTelephone())
+                .administrateur(utilisateur.isAdministrateur())
+                .build();
+    }
+    public static ResponseUtilisateurDto createUtilisateurToUtilisateurDtoResponse(CreateUtilisateurDto utilisateur) {
         return ResponseUtilisateurDto.builder()
                 .id(utilisateur.getId())
                 .nom(utilisateur.getNom())

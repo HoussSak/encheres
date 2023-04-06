@@ -1,6 +1,8 @@
 package fr.eni.encheres.service.helper;
 
+import fr.eni.encheres.common.UtilisateurConnecte;
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
+import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
 import fr.eni.encheres.exception.EntityNotFoundException;
 import fr.eni.encheres.exception.ErrorCodes;
 import fr.eni.encheres.jwt.JwtController;
@@ -17,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,43 +30,52 @@ public class UtilisateurServiceHelper {
     private final UserRepository userRepository;
     private final UtilisateurMapper utilisateurMapper;
     private final JwtController jwtController;
+    private final UtilisateurConnecte utilisateurConnecte;
 
     private final JwtUtils jwtUtils;
 
-    public UtilisateurServiceHelper(UserRepository userRepository, UtilisateurMapper utilisateurMapper, JwtController jwtController, JwtUtils jwtUtils) {
+    public UtilisateurServiceHelper(UserRepository userRepository, UtilisateurMapper utilisateurMapper, JwtController jwtController, UtilisateurConnecte utilisateurConnecte, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.utilisateurMapper = utilisateurMapper;
         this.jwtController = jwtController;
+        this.utilisateurConnecte = utilisateurConnecte;
         this.jwtUtils = jwtUtils;
     }
     @Transactional
-    public Tuple2<CreateUtilisateurDto, HttpHeaders> saveUtlisateur(CreateUtilisateurDto utilisateurDto) {
-        Utilisateur savedUser = userRepository.save(utilisateurMapper.UtilisateurDtoToUtilisateur(utilisateurDto));
+    public Tuple2<ResponseUtilisateurDto, HttpHeaders> saveUtlisateur(CreateUtilisateurDto utilisateurDto) {
+        Utilisateur savedUser = userRepository.save(UtilisateurMapper.createUtilisateurDtoToUtilisateur(utilisateurDto));
         log.info("User is created with id: {}", savedUser.getId());
-        CreateUtilisateurDto user = UtilisateurMapper.UtilisateurToUtilisateurDto(savedUser);
+        ResponseUtilisateurDto user = UtilisateurMapper.utilisateurToUtilisateurDtoResponse(savedUser);
         Authentication authentication = jwtController.logUser(utilisateurDto.getEmail(), utilisateurDto.getMotDePasse());
         String jwt = jwtUtils.generateToken(authentication);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         return Tuple.of(user,httpHeaders);
     }
-    public CreateUtilisateurDto findById(Integer id) {
+    public ResponseUtilisateurDto findById(Integer id) {
         Optional<Utilisateur> utilisateur = userRepository.findById(id);
-        CreateUtilisateurDto utilisateurDto = UtilisateurMapper.UtilisateurToUtilisateurDto(utilisateur.get());
+        ResponseUtilisateurDto utilisateurDto = UtilisateurMapper.utilisateurToUtilisateurDtoResponse(utilisateur.get());
         return Optional.of(utilisateurDto).orElseThrow(()->
                 new EntityNotFoundException("Utilisateur with ID = "+id+" not found", ErrorCodes.UTILISATEUR_NOT_FOUND));
     }
 
-    public void delete(Integer id) {
-        if (id == null) {
-            log.error("Utilisateur with ID = "+id+" not found ");
+    public void delete(Principal principal) {
+        Integer actualUserId =  utilisateurConnecte.getUserConnectedId(principal);
+        if (principal == null) {
+            log.error("Utilisateur with ID = "+principal+" not found ");
         }
+        userRepository.deleteById(actualUserId);
+    }
+
+    public void deleteAccount(Integer id) {
+        if (id == null) {
+            log.error("Utilisateur with ID = "+id+" not found ");}
         userRepository.deleteById(id);
     }
 
-    public List<CreateUtilisateurDto> readAllUsers() {
+    public List<ResponseUtilisateurDto> readAllUsers() {
         return userRepository.findAll().stream()
-                .map(UtilisateurMapper::UtilisateurToUtilisateurDto).
+                .map(UtilisateurMapper::utilisateurToUtilisateurDtoResponse).
                 collect(Collectors.toList());
     }
 }

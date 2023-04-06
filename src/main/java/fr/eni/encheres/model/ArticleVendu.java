@@ -38,7 +38,7 @@ public class ArticleVendu {
     private Categorie categorie;;
     @OneToOne(mappedBy = "articleVendu",cascade = CascadeType.ALL,optional = true)
     private Retrait retrait;
-    @OneToMany(mappedBy = "articleVendu")
+    @OneToMany(mappedBy = "articleVendu",cascade = CascadeType.ALL)
     private List<Enchere> encheres = new ArrayList<>();
 
 }
