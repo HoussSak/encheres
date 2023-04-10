@@ -18,6 +18,7 @@ public class UtilisateurMapper {
     public static Utilisateur createUtilisateurDtoToUtilisateur(CreateUtilisateurDto utilisateurDto) {
         return Utilisateur.builder()
                 .nom(StringUtils.capitalize(utilisateurDto.getNom()))
+                .prenom(StringUtils.capitalize(utilisateurDto.getPrenom()))
                 .pseudo(StringUtils.capitalize(utilisateurDto.getPseudo()))
                 .email(utilisateurDto.getEmail())
                 .adresse(utilisateurDto.getAdresse())
@@ -29,7 +30,6 @@ public class UtilisateurMapper {
     }
     public static CreateUtilisateurDto utilisateurToCreateUtilisateurDto(Utilisateur utilisateur) {
         return CreateUtilisateurDto.builder()
-                .id(utilisateur.getId())
                 .nom(utilisateur.getNom())
                 .pseudo(utilisateur.getPseudo())
                 .email(utilisateur.getEmail())
@@ -62,7 +62,6 @@ public class UtilisateurMapper {
   //  }
     public static ResponseUtilisateurDto createUtilisateurToUtilisateurDtoResponse(CreateUtilisateurDto utilisateur) {
         return ResponseUtilisateurDto.builder()
-                .id(utilisateur.getId())
                 .nom(utilisateur.getNom())
                 .prenom(utilisateur.getPrenom())
                 .pseudo(utilisateur.getPseudo())

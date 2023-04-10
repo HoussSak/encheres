@@ -16,7 +16,6 @@ import java.util.List;
 @Data
 @Builder
 public class CreateUtilisateurDto {
-    private Integer id;
     @NotBlank(message = "Veuillez renseigner le pseudo")
     private String pseudo;
     @NotBlank(message = "Veuillez renseigner le nom")
