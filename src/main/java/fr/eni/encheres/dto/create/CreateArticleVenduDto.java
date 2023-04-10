@@ -5,8 +5,8 @@ import fr.eni.encheres.model.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.Instant;
+
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -18,12 +18,12 @@ public class CreateArticleVenduDto {
     @NotBlank(message = "Veuillez renseigner une catégorie")
     private Categorie articleCategorie;
     @NotBlank(message = "Veuillez renseigner la date de début")
-    private Instant dateDebutEncheres;
+    private LocalDate dateDebutEncheres;
     @NotBlank(message = "Veuillez renseigner la date de fin")
-    private Instant dateFinEncheres;
+    private LocalDate dateFinEncheres;
     @NotBlank(message = "Veuillez renseigner le prix initial")
-    private BigDecimal prixInitial;
-    private BigDecimal prixVente;
+    private Integer prixInitial;
+    private Integer prixVente;
     @JsonIgnore
     private Utilisateur vendeur;
 

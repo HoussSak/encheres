@@ -4,6 +4,8 @@ import fr.eni.encheres.dto.create.CreateArticleVenduDto;
 import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
 import fr.eni.encheres.exception.ErrorCodes;
 import fr.eni.encheres.exception.InvalidEntityException;
+import fr.eni.encheres.model.Enchere;
+import fr.eni.encheres.model.EnchereId;
 import fr.eni.encheres.service.ArticleVenduService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
@@ -55,9 +57,14 @@ public class ArticleVenduController {
         return new ResponseEntity<>(savedArticle, HttpStatus.OK);
     }
     @GetMapping("/all")
-    public ResponseEntity<List<ResponseArticleVenduDto>> getAll() {
+    public ResponseEntity<List<ResponseArticleVenduDto>> getArticleList() {
         log.info("Processing finding all articles");
        return new ResponseEntity<> (articleVenduService.findAllArticles(),HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{idArticle}")
+    public void deleteAccountByAdmin(@PathVariable("idArticle") Integer id) {
+        articleVenduService.deleteArticleById(id);
     }
 
 }

@@ -3,6 +3,7 @@ package fr.eni.encheres.mapper;
 import fr.eni.encheres.dto.AdresseDto;
 import fr.eni.encheres.dto.create.CreateArticleVenduDto;
 import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
+import fr.eni.encheres.dto.response.ResponseEnchereDto;
 import fr.eni.encheres.model.ArticleVendu;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,25 @@ public class ArticleVenduMapper {
                         .ville(articleVendu.getRetrait().getAdresse().getVille())
                         .build())
                 .articleCategorie(articleVendu.getCategorie().getLibelle())
+                .vendeur(UtilisateurMapper.utilisateurToUtilisateurDtoResponse(articleVendu.getUtilisateur()))
+                .build();
+    }
+    public static ResponseArticleVenduDto articleVenduToArticleVenduDtoWithEnchereField(ArticleVendu articleVendu, ResponseEnchereDto responseEnchereDto){
+        return ResponseArticleVenduDto.builder()
+                .id(articleVendu.getNoArticle())
+                .nomArticle(articleVendu.getNomArticle())
+                .description(articleVendu.getDescription())
+                .prixInitial(articleVendu.getPrixInitial())
+                .dateDebutEncheres(articleVendu.getDateDebutEncheres())
+                .dateFinEncheres(articleVendu.getDateFinEncheres())
+                .retrait(AdresseDto.builder()
+                        .rue(articleVendu.getRetrait().getAdresse().getRue())
+                        .codePostal(articleVendu.getRetrait().getAdresse().getCodePostal())
+                        .ville(articleVendu.getRetrait().getAdresse().getVille())
+                        .build())
+                .articleCategorie(articleVendu.getCategorie().getLibelle())
+                .vendeur(UtilisateurMapper.utilisateurToUtilisateurDtoResponse(articleVendu.getUtilisateur()))
+                .enchere(responseEnchereDto)
                 .build();
     }
 

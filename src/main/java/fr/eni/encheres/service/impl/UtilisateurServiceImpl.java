@@ -67,12 +67,12 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     }
 
     @Override
-    public ResponseUtilisateurDto updateUtilisateur(CreateUtilisateurDto utilisateurDto, Integer id) {
-        return utilisateurServiceHelper.updateUser(utilisateurDto,id);
+    public ResponseUtilisateurDto updateUtilisateurByAdmin(CreateUtilisateurDto utilisateurDto, Integer id) {
+        return utilisateurServiceHelper.updateUserByAdmin(utilisateurDto,id);
     }
 
     @Override
-    public ResponseUtilisateurDto updateUtilisateurByAdmin(CreateUtilisateurDto utilisateurDto, Principal principal) {
-        return utilisateurServiceHelper.updateUserByAdmin(utilisateurDto,principal);
+    public Tuple2<ResponseUtilisateurDto, HttpHeaders> updateUtilisateur(CreateUtilisateurDto utilisateurDto, Principal principal) {
+        return utilisateurServiceHelper.updateUser(utilisateurDto,principal);
     }
 }

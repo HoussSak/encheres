@@ -13,4 +13,5 @@ public interface ArticleVenduService {
         ResponseArticleVenduDto updateArticle(@Valid CreateArticleVenduDto articleVenduDto, Integer principal);
 
         List<ResponseArticleVenduDto> findAllArticles();
+        void deleteArticleById(Integer id);
 }

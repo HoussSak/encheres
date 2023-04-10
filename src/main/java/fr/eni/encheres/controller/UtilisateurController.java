@@ -1,9 +1,11 @@
 package fr.eni.encheres.controller;
 
+import fr.eni.encheres.common.UtilisateurConnecte;
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
 import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
 import fr.eni.encheres.exception.ErrorCodes;
 import fr.eni.encheres.exception.InvalidEntityException;
+import fr.eni.encheres.model.Adresse;
 import fr.eni.encheres.service.UtilisateurService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.vavr.Tuple2;
@@ -28,8 +30,10 @@ import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
 public class UtilisateurController {
     private final UtilisateurService utilisateurService;
-    public UtilisateurController(UtilisateurService utilisateurService) {
+    private final UtilisateurConnecte utilisateurConnecte;
+    public UtilisateurController(UtilisateurService utilisateurService, UtilisateurConnecte utilisateurConnecte) {
         this.utilisateurService = utilisateurService;
+        this.utilisateurConnecte = utilisateurConnecte;
     }
 
     @PostMapping("/signup")
@@ -49,6 +53,12 @@ public class UtilisateurController {
         log.info("processing finding user by id: {}", id);
         return new ResponseEntity<>(utilisateurService.findById(id),HttpStatus.OK) ;
     }
+    @GetMapping("/userDetails")
+    public ResponseEntity<ResponseUtilisateurDto> findUserConnected(Principal principal) {
+        log.info("processing finding user connected");
+        Integer actualUserId =  utilisateurConnecte.getUserConnectedId(principal);
+        return new ResponseEntity<>(utilisateurService.findById(actualUserId),HttpStatus.OK) ;
+    }
     @GetMapping(value = "/all",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ResponseUtilisateurDto>> findAllUsers() {
         log.info("processing finding all users");
@@ -66,12 +76,12 @@ public class UtilisateurController {
     public void deleteAccount(Principal principal) {
         utilisateurService.delete(principal);
     }
-    @DeleteMapping("/delete/{idUtilisateur}")
+    @DeleteMapping("/admin/delete/{idUtilisateur}")
     public void deleteAccountByAdmin(@PathVariable("idUtilisateur") Integer id) {
         utilisateurService.deleteAccountByAdmin(id);
     }
     @PatchMapping("/admin/update/{idUtilisateur}")
-    public ResponseEntity<ResponseUtilisateurDto> modifyUserByAdmin(@PathVariable("idUtilisateur") Integer id,
+    public ResponseEntity<ResponseUtilisateurDto> EditUserProfileByAdmin(@PathVariable("idUtilisateur") Integer id,
                                                              @RequestBody CreateUtilisateurDto utilisateurDto,
                                                              BindingResult result) {
         List<String> errors = result.getFieldErrors().stream()
@@ -81,22 +91,37 @@ public class UtilisateurController {
             throw new InvalidEntityException("Utilisateur not valid", ErrorCodes.UTILISATEUR_NOT_VALID, errors);
         }
         log.info("Updating user with id: {}", id);
-        ResponseUtilisateurDto userSaved = utilisateurService.updateUtilisateur(utilisateurDto,id);
+        ResponseUtilisateurDto userSaved = utilisateurService.updateUtilisateurByAdmin(utilisateurDto,id);
         return new ResponseEntity<>(userSaved, HttpStatus.OK);
     }
     @PatchMapping("/update")
-    public ResponseEntity<ResponseUtilisateurDto> modifyUser(Principal principal,
-                                                             @RequestBody CreateUtilisateurDto utilisateurDto,
-                                                             BindingResult result) {
-        List<String> errors = result.getFieldErrors().stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
-        if (!errors.isEmpty()) {
-            throw new InvalidEntityException("Utilisateur not valid", ErrorCodes.UTILISATEUR_NOT_VALID, errors);
-        }
-        ResponseUtilisateurDto userSaved = utilisateurService.updateUtilisateurByAdmin(utilisateurDto,principal);
-        return new ResponseEntity<>(userSaved, HttpStatus.OK);
+    public ResponseEntity<ResponseUtilisateurDto> editUserProfile(
+            Principal principal,
+            @RequestParam(value = "pseudo", required = false) String pseudo,
+            @RequestParam(value = "nom", required = false) String nom,
+            @RequestParam(value = "prenom", required = false) String prenom,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "telephone", required = false) String telephone,
+            @RequestParam(value = "adresseRue", required = false) String adresseRue,
+            @RequestParam(value = "adresseCodePostal", required = false) String adresseCodePostal,
+            @RequestParam(value = "adresseVille", required = false) String adresseVille,
+            @RequestParam(value = "motDePasse", required = false) String motDePasse
+    ) {
+        CreateUtilisateurDto utilisateurDto = CreateUtilisateurDto.builder()
+                .pseudo(pseudo)
+                .nom(nom)
+                .prenom(prenom)
+                .email(email)
+                .telephone(telephone)
+                .adresse(new Adresse(adresseRue, adresseCodePostal, adresseVille))
+                .motDePasse(motDePasse)
+                .build();
+        System.out.println(pseudo);
+
+        Tuple2<ResponseUtilisateurDto, HttpHeaders> userSaved = utilisateurService.updateUtilisateur(utilisateurDto, principal);
+        return new ResponseEntity<>(userSaved._1, userSaved._2, HttpStatus.OK);
     }
+
 
 
 }

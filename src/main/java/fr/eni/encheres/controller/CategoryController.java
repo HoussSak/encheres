@@ -35,4 +35,8 @@ public class CategoryController {
         Categorie savedCategory = categoryRepository.save(categorie);
         return new ResponseEntity<>(savedCategory, HttpStatus.OK);
     }
+    @DeleteMapping("/delete/{idCategory}")
+    public void deleteCategoryByAdmin(@PathVariable("idCategory") Integer id) {
+        categoryRepository.deleteById(id);
+    }
 }

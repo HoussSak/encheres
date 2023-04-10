@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +25,13 @@ public class ArticleVendu {
     private String nomArticle;
     private String description;
     @Column(name = "date_debut_encheres")
-    private Instant dateDebutEncheres;
+    private LocalDate dateDebutEncheres;
     @Column(name = "date_fin_encheres")
-    private Instant dateFinEncheres;
+    private LocalDate dateFinEncheres;
     @Column(name = "prix_initial")
-    private BigDecimal prixInitial;
+    private Integer prixInitial;
     @Column(name = "prix_vente")
-    private BigDecimal prixVente;
+    private Integer prixVente;
     @ManyToOne
     @JoinColumn(name = "no_utilisateur")
     private Utilisateur utilisateur;

@@ -1,16 +1,17 @@
 package fr.eni.encheres.mapper;
 
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
-import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
 import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
+import fr.eni.encheres.model.Adresse;
 import fr.eni.encheres.model.Utilisateur;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 @Component
 public class UtilisateurMapper {
@@ -24,7 +25,6 @@ public class UtilisateurMapper {
                 .motDePasse(new BCryptPasswordEncoder().encode(utilisateurDto.getMotDePasse()))
                 .credit(utilisateurDto.getCredit())
                 .administrateur(utilisateurDto.isAdministrateur())
-                .articles(utilisateurDto.getArticles())
                 .build();
     }
     public static CreateUtilisateurDto utilisateurToCreateUtilisateurDto(Utilisateur utilisateur) {
@@ -44,22 +44,22 @@ public class UtilisateurMapper {
         return ResponseUtilisateurDto.builder()
                 .id(utilisateur.getId())
                 .nom(utilisateur.getNom())
+                .prenom(utilisateur.getPrenom())
                 .pseudo(utilisateur.getPseudo())
                 .email(utilisateur.getEmail())
                 .adresse(utilisateur.getAdresse())
                 .telephone(utilisateur.getTelephone())
                 .administrateur(utilisateur.isAdministrateur())
-                .articles(getArticles(utilisateur))
                 .build();
     }
 
-    private static List<ResponseArticleVenduDto> getArticles(Utilisateur utilisateur) {
-        if (utilisateur.getArticles() == null) {
-            return List.of();
-        }
-       return utilisateur.getArticles().stream().map(ArticleVenduMapper::articleVenduToArticleVenduDto
-                ).collect(Collectors.toList());
-    }
+  //  private static List<ResponseArticleVenduDto> getArticles(Utilisateur utilisateur) {
+  //      if (utilisateur.getArticles() == null) {
+  //          return List.of();
+  //      }
+  //     return utilisateur.getArticles().stream().map(ArticleVenduMapper::articleVenduToArticleVenduDto
+  //              ).collect(Collectors.toList());
+  //  }
     public static ResponseUtilisateurDto createUtilisateurToUtilisateurDtoResponse(CreateUtilisateurDto utilisateur) {
         return ResponseUtilisateurDto.builder()
                 .id(utilisateur.getId())
@@ -72,16 +72,43 @@ public class UtilisateurMapper {
                 .administrateur(utilisateur.isAdministrateur())
                 .build();
     }
-    public static Utilisateur updateUpate(CreateUtilisateurDto utilisateurDto, Utilisateur foundUser) {
-        return Utilisateur.builder()
-                .id(foundUser.getId())
-                .nom(StringUtils.capitalize(utilisateurDto.getNom()))
-                .prenom(StringUtils.capitalize(utilisateurDto.getPrenom()))
-                .pseudo(StringUtils.capitalize(utilisateurDto.getPseudo()))
-                .email(utilisateurDto.getEmail())
-                .adresse(utilisateurDto.getAdresse())
-                .telephone(utilisateurDto.getTelephone())
-                .motDePasse(new BCryptPasswordEncoder().encode(utilisateurDto.getMotDePasse()))
-                .build();
+    public static Utilisateur updateProfile(CreateUtilisateurDto utilisateurDto, Utilisateur foundUser) {
+        Map<Consumer<String>, String> setters = new HashMap<>();
+        setters.put(foundUser::setNom, StringUtils.capitalize(utilisateurDto.getNom()));
+        setters.put(foundUser::setPrenom, StringUtils.capitalize(utilisateurDto.getPrenom()));
+        setters.put(foundUser::setPseudo, StringUtils.capitalize(utilisateurDto.getPseudo()));
+        setters.put(foundUser::setEmail, utilisateurDto.getEmail());
+        setters.put(foundUser::setTelephone, utilisateurDto.getTelephone());
+
+        // Mise à jour de l'adresse
+        if (utilisateurDto.getAdresse() != null) {
+            Adresse adresse = foundUser.getAdresse();
+            if (adresse == null) {
+                adresse = new Adresse();
+            }
+            if (utilisateurDto.getAdresse().getRue() != null) {
+                adresse.setRue(utilisateurDto.getAdresse().getRue());
+            }
+            if (utilisateurDto.getAdresse().getCodePostal() != null) {
+                adresse.setCodePostal(utilisateurDto.getAdresse().getCodePostal());
+            }
+            if (utilisateurDto.getAdresse().getVille() != null) {
+                adresse.setVille(utilisateurDto.getAdresse().getVille());
+            }
+            foundUser.setAdresse(adresse);
+        }
+        if (utilisateurDto.getMotDePasse() != null) {
+            foundUser.setMotDePasse(new BCryptPasswordEncoder().encode(utilisateurDto.getMotDePasse()));
+        }
+
+        setters.forEach((setter, value) -> {
+            if (value != null) {
+                setter.accept(value);
+            }
+        });
+
+        return foundUser;
     }
+
+
 }

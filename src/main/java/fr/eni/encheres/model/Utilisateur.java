@@ -1,6 +1,8 @@
 package fr.eni.encheres.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @Entity
 @Builder
 @Table(name = "utilisateurs")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Utilisateur {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +32,8 @@ public class Utilisateur {
    private Integer credit;
    private boolean administrateur;
    @OneToMany(mappedBy = "utilisateur",cascade = CascadeType.ALL)
-   @JsonIgnore
    private List<ArticleVendu> articles;
    @OneToMany(mappedBy = "utilisateur",cascade = CascadeType.ALL)
-   @JsonIgnore
    private List<Enchere> encheres;
 
 }

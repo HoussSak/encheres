@@ -17,8 +17,8 @@ public interface UtilisateurService {
 
     void delete(Principal principal);
     void deleteAccountByAdmin(Integer id);
-    ResponseUtilisateurDto updateUtilisateur(@Valid CreateUtilisateurDto utilisateurDto, Integer id);
-    ResponseUtilisateurDto updateUtilisateurByAdmin(@Valid CreateUtilisateurDto utilisateurDto, Principal principal);
+    ResponseUtilisateurDto updateUtilisateurByAdmin(@Valid CreateUtilisateurDto utilisateurDto, Integer id);
+    Tuple2<ResponseUtilisateurDto, HttpHeaders> updateUtilisateur(@Valid CreateUtilisateurDto utilisateurDto, Principal principal);
 }
 
 

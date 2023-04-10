@@ -79,22 +79,35 @@ public class UtilisateurServiceHelper {
                 collect(Collectors.toList());
     }
     @Transactional
-    public ResponseUtilisateurDto updateUser(CreateUtilisateurDto utilisateurDto,Integer id ) {
+    public ResponseUtilisateurDto updateUserByAdmin(CreateUtilisateurDto utilisateurDto,Integer id ) {
         Optional<Utilisateur> optionalUser = userRepository.findById(id);
         Utilisateur foundUser = optionalUser.orElseThrow(() -> new EntityNotFoundException("Utilisateur with ID = " + id + " not found", ErrorCodes.UTILISATEUR_NOT_FOUND));
-        Utilisateur updatedUser = UtilisateurMapper.updateUpate(utilisateurDto,foundUser);
+        Utilisateur updatedUser = UtilisateurMapper.updateProfile(utilisateurDto,foundUser);
         Utilisateur savedUser = userRepository.save(updatedUser);
         log.info("User with ID = {} is updated", savedUser.getId());
         return UtilisateurMapper.utilisateurToUtilisateurDtoResponse(savedUser);
     }
-
-    public ResponseUtilisateurDto updateUserByAdmin(CreateUtilisateurDto utilisateurDto, Principal principal) {
+    @Transactional
+    public Tuple2<ResponseUtilisateurDto, HttpHeaders> updateUser(CreateUtilisateurDto utilisateurDto, Principal principal) {
         Integer id =  utilisateurConnecte.getUserConnectedId(principal);
         Optional<Utilisateur> optionalUser = userRepository.findById(id);
         Utilisateur foundUser = optionalUser.orElseThrow(() -> new EntityNotFoundException("Utilisateur with ID = " + id + " not found", ErrorCodes.UTILISATEUR_NOT_FOUND));
-        Utilisateur updatedUser = UtilisateurMapper.updateUpate(utilisateurDto,foundUser);
+        Utilisateur updatedUser = UtilisateurMapper.updateProfile(utilisateurDto,foundUser);
         Utilisateur savedUser = userRepository.save(updatedUser);
         log.info("User with ID = {} is updated", savedUser.getId());
-        return UtilisateurMapper.utilisateurToUtilisateurDtoResponse(savedUser);
+        HttpHeaders httpHeaders = getHttpHeaders(utilisateurDto,savedUser);
+        ResponseUtilisateurDto responseUtilisateurDto = UtilisateurMapper.utilisateurToUtilisateurDtoResponse(savedUser);
+        return Tuple.of(responseUtilisateurDto,httpHeaders);
+    }
+
+    private HttpHeaders getHttpHeaders(CreateUtilisateurDto utilisateurDto, Utilisateur savedUser) {
+        if (utilisateurDto.getEmail() != null && utilisateurDto.getEmail() == savedUser.getEmail()) {
+            return new HttpHeaders();
+        }
+        Authentication authentication = jwtController.logUser(savedUser.getEmail(), utilisateurDto.getMotDePasse());
+        String jwt = jwtUtils.generateToken(authentication);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        return httpHeaders;
     }
 }

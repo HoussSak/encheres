@@ -4,15 +4,14 @@ import fr.eni.encheres.common.UtilisateurConnecte;
 import fr.eni.encheres.dto.create.CreateArticleVenduDto;
 import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
 import fr.eni.encheres.mapper.ArticleVenduMapper;
-import fr.eni.encheres.mapper.UtilisateurMapper;
 import fr.eni.encheres.model.ArticleVendu;
-import fr.eni.encheres.model.Categorie;
 import fr.eni.encheres.model.Retrait;
 import fr.eni.encheres.model.Utilisateur;
 import fr.eni.encheres.repository.ArticleVenduRepository;
 import fr.eni.encheres.repository.RetraitRepository;
 import fr.eni.encheres.repository.UserRepository;
 import fr.eni.encheres.service.ArticleVenduService;
+import fr.eni.encheres.service.helper.ArticlevenduServiceHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +29,15 @@ public class ArticleServiceImpl implements ArticleVenduService {
     private final ArticleVenduRepository articleVenduRepository;
     private final ArticleVenduMapper articleVenduMapper;
     private final RetraitRepository retraitRepository;
+    private final ArticlevenduServiceHelper articlevenduServiceHelper;
 
-    public ArticleServiceImpl(UtilisateurConnecte utilisateurConnecte, UserRepository userRepository, ArticleVenduRepository articleVenduRepository, ArticleVenduMapper articleVenduMapper, RetraitRepository retraitRepository) {
+    public ArticleServiceImpl(UtilisateurConnecte utilisateurConnecte, UserRepository userRepository, ArticleVenduRepository articleVenduRepository, ArticleVenduMapper articleVenduMapper, RetraitRepository retraitRepository, ArticlevenduServiceHelper articlevenduServiceHelper) {
         this.utilisateurConnecte = utilisateurConnecte;
         this.userRepository = userRepository;
         this.articleVenduRepository = articleVenduRepository;
         this.articleVenduMapper = articleVenduMapper;
         this.retraitRepository = retraitRepository;
+        this.articlevenduServiceHelper = articlevenduServiceHelper;
     }
 
     @Override
@@ -49,6 +50,8 @@ public class ArticleServiceImpl implements ArticleVenduService {
         articleVendu.setRetrait(getRetraitByDefault(articleVendu,existingUser.get()));
         articleVendu.setCategorie(articleVendu.getCategorie());
         ArticleVendu savedArticle = articleVenduRepository.save(articleVendu);
+        log.info("Article successfully saved with id : {}", savedArticle.getNoArticle());
+        //articlevenduServiceHelper.createAndSaveNewEnchere(savedArticle);
         return ArticleVenduMapper.articleVenduToArticleVenduDto(savedArticle);
     }
 
@@ -66,9 +69,14 @@ public class ArticleServiceImpl implements ArticleVenduService {
 
     @Override
     public List<ResponseArticleVenduDto> findAllArticles() {
-        return articleVenduRepository.findAll().stream()
-                .map(ArticleVenduMapper::articleVenduToArticleVenduDto)
-                .collect(Collectors.toList());
+        return articlevenduServiceHelper.getArticleList();
+    }
+
+    @Override
+    public void deleteArticleById(Integer id) {
+        if (id == null) {
+            log.error("Article with ID = "+id+" not found ");}
+        articleVenduRepository.deleteById(id);
     }
 
 
