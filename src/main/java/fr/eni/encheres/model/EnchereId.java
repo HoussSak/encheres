@@ -20,6 +20,4 @@ public class EnchereId implements Serializable {
     @Column(name = "no_article")
     private Integer articleId;
 
-    // constructeurs, getters, setters, equals, hashCode
-
 }

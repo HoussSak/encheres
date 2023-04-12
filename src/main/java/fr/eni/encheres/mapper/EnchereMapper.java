@@ -11,6 +11,7 @@ public class EnchereMapper {
             return ResponseEnchereDto.builder().build();
         }
         return ResponseEnchereDto.builder()
+                .id(enchere.getUtilisateur().getId())
                 .montantEnchere(enchere.getMontantEnchere())
                 .dateEnchere(enchere.getDateEnchere())
                 .acheteur(enchere.getUtilisateur().getNom())

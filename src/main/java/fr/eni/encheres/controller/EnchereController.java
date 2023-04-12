@@ -1,6 +1,7 @@
 package fr.eni.encheres.controller;
 
 import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
+import fr.eni.encheres.dto.response.ResponseEnchereDto;
 import fr.eni.encheres.model.Enchere;
 import fr.eni.encheres.service.impl.EnchereService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,9 +28,9 @@ public class EnchereController {
     public void addNeweEnchere( @PathVariable Integer idArticle, @RequestParam Integer montant, Principal principal) {
         enchereService.addNewEnchere( idArticle, montant,principal);
     }
-    @GetMapping("/all")
-    public ResponseEntity<List<Enchere>> getEnchereList() {
+    @GetMapping("/all/{idEnchere}")
+    public ResponseEntity<List<ResponseEnchereDto>> getEnchereList(@PathVariable Integer idEnchere) {
         log.info("Processing finding all encheres");
-        return new ResponseEntity<> (enchereService.findAllEnchere(), HttpStatus.OK);
+        return new ResponseEntity<> (enchereService.findAllEnchere(idEnchere), HttpStatus.OK);
     }
 }

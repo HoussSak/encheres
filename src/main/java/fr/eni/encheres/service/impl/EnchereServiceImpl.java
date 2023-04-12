@@ -1,8 +1,10 @@
 package fr.eni.encheres.service.impl;
 
 import fr.eni.encheres.common.UtilisateurConnecte;
+import fr.eni.encheres.dto.response.ResponseEnchereDto;
 import fr.eni.encheres.exception.EntityNotFoundException;
 import fr.eni.encheres.exception.ErrorCodes;
+import fr.eni.encheres.mapper.EnchereMapper;
 import fr.eni.encheres.model.ArticleVendu;
 import fr.eni.encheres.model.Enchere;
 import fr.eni.encheres.model.EnchereId;
@@ -18,6 +20,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -53,8 +56,14 @@ public class EnchereServiceImpl implements EnchereService {
     }
 
     @Override
-    public List<Enchere> findAllEnchere() {
-        return enchereRepository.findAll();    }
+    public List<ResponseEnchereDto> findAllEnchere(Integer idArticle) {
+        ArticleVendu articleVendu = articleVenduRepository.findById(idArticle).orElseThrow(() ->
+                new EntityNotFoundException("Article with ID = "+idArticle+" not found", ErrorCodes.ARTICLE_NOT_FOUND));
+        return enchereRepository.findByArticleVenduOrderByMontantEnchereDesc(articleVendu)
+                .stream()
+                .map(EnchereMapper::enchereToResponseEnchereDto)
+                .collect(Collectors.toList());
+    }
 
     private void refundingVerification(Enchere meilleureEnchere) {
         if (meilleureEnchere != null) {

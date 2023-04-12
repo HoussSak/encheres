@@ -2,6 +2,7 @@ package fr.eni.encheres.service.helper;
 
 import fr.eni.encheres.common.UtilisateurConnecte;
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
+import fr.eni.encheres.dto.response.ResponseEnchereDto;
 import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
 import fr.eni.encheres.exception.EntityNotFoundException;
 import fr.eni.encheres.exception.ErrorCodes;
@@ -10,7 +11,9 @@ import fr.eni.encheres.jwt.JwtFilter;
 import fr.eni.encheres.jwt.JwtUtils;
 import fr.eni.encheres.mapper.UtilisateurMapper;
 import fr.eni.encheres.model.Utilisateur;
+import fr.eni.encheres.repository.EnchereRepository;
 import fr.eni.encheres.repository.UserRepository;
+import fr.eni.encheres.service.impl.EnchereService;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import lombok.extern.slf4j.Slf4j;
@@ -23,22 +26,27 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
 public class UtilisateurServiceHelper {
     private final UserRepository userRepository;
     private final UtilisateurMapper utilisateurMapper;
+    private final ArticlevenduServiceHelper articlevenduServiceHelper;
     private final JwtController jwtController;
     private final UtilisateurConnecte utilisateurConnecte;
+    private final EnchereService enchereService;
 
     private final JwtUtils jwtUtils;
 
-    public UtilisateurServiceHelper(UserRepository userRepository, UtilisateurMapper utilisateurMapper, JwtController jwtController, UtilisateurConnecte utilisateurConnecte, JwtUtils jwtUtils) {
+    public UtilisateurServiceHelper(UserRepository userRepository, UtilisateurMapper utilisateurMapper, ArticlevenduServiceHelper articlevenduServiceHelper, JwtController jwtController, UtilisateurConnecte utilisateurConnecte, EnchereService enchereService, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.utilisateurMapper = utilisateurMapper;
+        this.articlevenduServiceHelper = articlevenduServiceHelper;
         this.jwtController = jwtController;
         this.utilisateurConnecte = utilisateurConnecte;
+        this.enchereService = enchereService;
         this.jwtUtils = jwtUtils;
     }
     @Transactional
@@ -61,10 +69,44 @@ public class UtilisateurServiceHelper {
 
     public void delete(Principal principal) {
         Integer actualUserId =  utilisateurConnecte.getUserConnectedId(principal);
-        if (principal == null) {
-            log.error("Utilisateur with ID = "+principal+" not found ");
+        if (actualUserId == null) {
+            log.error("Utilisateur with ID = "+actualUserId+" not found ");
         }
+        Utilisateur user = userRepository.findById(actualUserId).get();
+
+        Integer refundSum = articlevenduServiceHelper.getArticleList().stream().map(responseArticleVenduDto -> {
+            Integer id = responseArticleVenduDto.getEnchere().getId();
+            Integer montantEnchere = responseArticleVenduDto.getEnchere().getMontantEnchere();
+            Integer montantArembourser=0;
+            if (id != null && id == actualUserId) {
+                log.info("bid found for user with ID:{} with an amount of: {} for article id: {}", id, montantEnchere, responseArticleVenduDto.getId());
+                montantArembourser = montantEnchere;
+            }
+            return montantArembourser;
+        }).mapToInt(Integer::intValue).sum();
+
+        if (refundSum == null) {
+            log.info("no bid is found for user with ID:{}", actualUserId);
+            log.info("Processing deleting acount for user with id:{}", actualUserId);
+            userRepository.deleteById(actualUserId);
+        }
+        log.info("Processing refunding an amount of: {} to  user user with id:{}", refundSum,actualUserId);
+        user.setCredit(refundSum);
+        userRepository.save(user);
+        log.info("user successfully refunded");
         userRepository.deleteById(actualUserId);
+
+         articlevenduServiceHelper.getArticleList().forEach(responseArticleVenduDto -> {
+            List<ResponseEnchereDto> allEnchere = enchereService.findAllEnchere(responseArticleVenduDto.getId());
+            allEnchere.forEach(responseEnchereDto -> {
+                Utilisateur enchereUser = userRepository.findById(responseEnchereDto.getId()).get();
+                if (enchereUser.getCredit() >= responseEnchereDto.getMontantEnchere()) {
+                    Integer newCredit = enchereUser.getCredit() - responseEnchereDto.getMontantEnchere();
+                    enchereUser.setCredit(newCredit);
+                    userRepository.save(enchereUser);
+                }
+            });
+         });
     }
 
     public void deleteAccount(Integer id) {
@@ -101,7 +143,7 @@ public class UtilisateurServiceHelper {
     }
 
     private HttpHeaders getHttpHeaders(CreateUtilisateurDto utilisateurDto, Utilisateur savedUser) {
-        if (utilisateurDto.getEmail() != null && utilisateurDto.getEmail() == savedUser.getEmail()) {
+        if (utilisateurDto.getEmail() == null) {
             return new HttpHeaders();
         }
         Authentication authentication = jwtController.logUser(savedUser.getEmail(), utilisateurDto.getMotDePasse());

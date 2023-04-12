@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class ResponseEnchereDto {
+    private Integer id;
     private LocalDate dateEnchere;
 
     private Integer montantEnchere;

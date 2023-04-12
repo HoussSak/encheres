@@ -5,20 +5,21 @@ import fr.eni.encheres.dto.create.CreateArticleVenduDto;
 import fr.eni.encheres.dto.response.ResponseArticleVenduDto;
 import fr.eni.encheres.dto.response.ResponseEnchereDto;
 import fr.eni.encheres.model.ArticleVendu;
+import fr.eni.encheres.model.Categorie;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
 public class ArticleVenduMapper {
-    public static ArticleVendu articleVenduDtoToArticleVendu(CreateArticleVenduDto articleVenduDto){
+    public static ArticleVendu articleVenduDtoToArticleVendu(CreateArticleVenduDto articleVenduDto, Categorie categorie){
         return ArticleVendu.builder()
                 .nomArticle(articleVenduDto.getNomArticle())
                 .description(articleVenduDto.getDescription())
                 .prixInitial(articleVenduDto.getPrixInitial())
                 .dateDebutEncheres(articleVenduDto.getDateDebutEncheres())
                 .dateFinEncheres(articleVenduDto.getDateFinEncheres())
-                .categorie(articleVenduDto.getArticleCategorie())
+                .categorie(categorie)
                 .build();
     }
     public static ResponseArticleVenduDto articleVenduToArticleVenduDto(ArticleVendu articleVendu){
@@ -57,7 +58,7 @@ public class ArticleVenduMapper {
                 .build();
     }
 
-    public static ArticleVendu updateArticle(CreateArticleVenduDto articleVenduDto, ArticleVendu existingArticle) {
+    public static ArticleVendu updateArticle(CreateArticleVenduDto articleVenduDto, ArticleVendu existingArticle, Categorie categorie) {
         return ArticleVendu.builder()
                 .noArticle(existingArticle.getNoArticle())
                 .nomArticle(articleVenduDto.getNomArticle())
@@ -65,7 +66,7 @@ public class ArticleVenduMapper {
                 .prixInitial(articleVenduDto.getPrixInitial())
                 .dateDebutEncheres(articleVenduDto.getDateDebutEncheres())
                 .dateFinEncheres(articleVenduDto.getDateFinEncheres())
-                .categorie(articleVenduDto.getArticleCategorie())
+                .categorie(categorie)
                 .retrait(existingArticle.getRetrait())
                 .build();
     }

@@ -16,7 +16,7 @@ public class CreateArticleVenduDto {
     @NotBlank(message = "Veuillez renseigner le nom de la déscription")
     private String description;
     @NotBlank(message = "Veuillez renseigner une catégorie")
-    private Categorie articleCategorie;
+    private String articleCategorie;
     @NotBlank(message = "Veuillez renseigner la date de début")
     private LocalDate dateDebutEncheres;
     @NotBlank(message = "Veuillez renseigner la date de fin")
