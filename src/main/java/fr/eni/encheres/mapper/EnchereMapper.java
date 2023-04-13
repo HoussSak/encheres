@@ -14,7 +14,7 @@ public class EnchereMapper {
                 .id(enchere.getUtilisateur().getId())
                 .montantEnchere(enchere.getMontantEnchere())
                 .dateEnchere(enchere.getDateEnchere())
-                .acheteur(enchere.getUtilisateur().getNom())
+                .acheteur(enchere.getUtilisateur().getPseudo())
                 .build();
     }
 }

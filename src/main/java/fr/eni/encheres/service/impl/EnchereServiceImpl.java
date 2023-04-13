@@ -48,9 +48,12 @@ public class EnchereServiceImpl implements EnchereService {
                 new EntityNotFoundException("Article with ID = "+idArticle+" not found", ErrorCodes.ARTICLE_NOT_FOUND));
         int nouveauCredit = enchereServiceHelper.VerifyCredit(montantProposé, utilisateur, articleVendu);
         Enchere meilleureEnchere = enchereRepository.findFirstByArticleVenduOrderByMontantEnchereDesc(articleVendu);
-        refundingVerification(meilleureEnchere);
-        utilisateur.setCredit(nouveauCredit);
-        userRepository.save(utilisateur);
+        refundingVerification(meilleureEnchere,actualUserId,nouveauCredit);
+        if (utilisateur.getId() != meilleureEnchere.getUtilisateur().getId()) {
+            utilisateur.setCredit(nouveauCredit);
+            userRepository.save(utilisateur);
+        }
+
 
         saveEnchere(montantProposé, utilisateur, articleVendu);
     }
@@ -65,11 +68,18 @@ public class EnchereServiceImpl implements EnchereService {
                 .collect(Collectors.toList());
     }
 
-    private void refundingVerification(Enchere meilleureEnchere) {
+    private void refundingVerification(Enchere meilleureEnchere,Integer actualUser,Integer nouveauCredit) {
         if (meilleureEnchere != null) {
             Utilisateur meilleurEncherisseur = meilleureEnchere.getUtilisateur();
-            meilleurEncherisseur.setCredit(meilleurEncherisseur.getCredit() + meilleureEnchere.getMontantEnchere());
-            userRepository.save(meilleurEncherisseur);
+            if (meilleurEncherisseur.getId() == actualUser) {
+                Integer montantArembourser = nouveauCredit + meilleureEnchere.getMontantEnchere();
+                meilleurEncherisseur.setCredit(montantArembourser);
+                userRepository.save(meilleurEncherisseur);
+            } else {
+                meilleurEncherisseur.setCredit(meilleurEncherisseur.getCredit() + meilleureEnchere.getMontantEnchere());
+                userRepository.save(meilleurEncherisseur);
+            }
+
         }
     }
     private void saveEnchere(Integer montantProposé, Utilisateur utilisateur, ArticleVendu articleVendu) {

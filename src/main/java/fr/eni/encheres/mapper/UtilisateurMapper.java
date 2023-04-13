@@ -3,6 +3,7 @@ package fr.eni.encheres.mapper;
 import fr.eni.encheres.dto.create.CreateUtilisateurDto;
 import fr.eni.encheres.dto.response.ResponseUtilisateurDto;
 import fr.eni.encheres.model.Adresse;
+import fr.eni.encheres.model.UserHistory;
 import fr.eni.encheres.model.Utilisateur;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class UtilisateurMapper {
                 .adresse(utilisateurDto.getAdresse())
                 .telephone(utilisateurDto.getTelephone())
                 .motDePasse(new BCryptPasswordEncoder().encode(utilisateurDto.getMotDePasse()))
-                .credit(utilisateurDto.getCredit())
+                .credit(100)
                 .administrateur(utilisateurDto.isAdministrateur())
                 .build();
     }
@@ -47,6 +48,7 @@ public class UtilisateurMapper {
                 .prenom(utilisateur.getPrenom())
                 .pseudo(utilisateur.getPseudo())
                 .email(utilisateur.getEmail())
+                .credit(utilisateur.getCredit())
                 .adresse(utilisateur.getAdresse())
                 .telephone(utilisateur.getTelephone())
                 .administrateur(utilisateur.isAdministrateur())
@@ -107,6 +109,19 @@ public class UtilisateurMapper {
         });
 
         return foundUser;
+    }
+
+    public static  UserHistory utilisateurToUserHistory(Utilisateur utilisateur) {
+        return UserHistory.builder()
+                .nom(StringUtils.capitalize(utilisateur.getNom()))
+                .prenom(StringUtils.capitalize(utilisateur.getPrenom()))
+                .pseudo(StringUtils.capitalize(utilisateur.getPseudo()))
+                .email(utilisateur.getEmail())
+                .adresse(utilisateur.getAdresse())
+                .telephone(utilisateur.getTelephone())
+                .credit(utilisateur.getCredit())
+                .administrateur(utilisateur.isAdministrateur())
+                .build();
     }
 
 

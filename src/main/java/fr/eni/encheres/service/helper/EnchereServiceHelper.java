@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EnchereServiceHelper {
     public int VerifyCredit(Integer montantProposé, Utilisateur utilisateur, ArticleVendu articleVendu) {
-        if (montantProposé <= articleVendu.getNoArticle()) {
-            log.error("le montant proposé: {} est infériere ai prix de vente: {}", montantProposé, articleVendu.getPrixVente());
+        if (montantProposé <= articleVendu.getPrixInitial()) {
+            log.error("le montant proposé: {} est infériere au prix de vente: {}", montantProposé, articleVendu.getPrixVente());
             throw new InvalidEntityException("le montant proposé est infériere ai prix de vente");
         }
         int nouveauCredit = utilisateur.getCredit() - montantProposé;

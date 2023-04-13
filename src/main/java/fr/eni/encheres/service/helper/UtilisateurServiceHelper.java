@@ -10,8 +10,9 @@ import fr.eni.encheres.jwt.JwtController;
 import fr.eni.encheres.jwt.JwtFilter;
 import fr.eni.encheres.jwt.JwtUtils;
 import fr.eni.encheres.mapper.UtilisateurMapper;
+import fr.eni.encheres.model.UserHistory;
 import fr.eni.encheres.model.Utilisateur;
-import fr.eni.encheres.repository.EnchereRepository;
+import fr.eni.encheres.repository.UserHistoryRepository;
 import fr.eni.encheres.repository.UserRepository;
 import fr.eni.encheres.service.impl.EnchereService;
 import io.vavr.Tuple;
@@ -26,7 +27,6 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -37,16 +37,18 @@ public class UtilisateurServiceHelper {
     private final JwtController jwtController;
     private final UtilisateurConnecte utilisateurConnecte;
     private final EnchereService enchereService;
+    private final UserHistoryRepository userHistoryRepository;
 
     private final JwtUtils jwtUtils;
 
-    public UtilisateurServiceHelper(UserRepository userRepository, UtilisateurMapper utilisateurMapper, ArticlevenduServiceHelper articlevenduServiceHelper, JwtController jwtController, UtilisateurConnecte utilisateurConnecte, EnchereService enchereService, JwtUtils jwtUtils) {
+    public UtilisateurServiceHelper(UserRepository userRepository, UtilisateurMapper utilisateurMapper, ArticlevenduServiceHelper articlevenduServiceHelper, JwtController jwtController, UtilisateurConnecte utilisateurConnecte, EnchereService enchereService, UserHistoryRepository userHistoryRepository, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.utilisateurMapper = utilisateurMapper;
         this.articlevenduServiceHelper = articlevenduServiceHelper;
         this.jwtController = jwtController;
         this.utilisateurConnecte = utilisateurConnecte;
         this.enchereService = enchereService;
+        this.userHistoryRepository = userHistoryRepository;
         this.jwtUtils = jwtUtils;
     }
     @Transactional
@@ -85,16 +87,24 @@ public class UtilisateurServiceHelper {
             return montantArembourser;
         }).mapToInt(Integer::intValue).sum();
 
-        if (refundSum == null) {
+        if (refundSum == 0) {
             log.info("no bid is found for user with ID:{}", actualUserId);
             log.info("Processing deleting acount for user with id:{}", actualUserId);
+            UserHistory userHistory = UtilisateurMapper.utilisateurToUserHistory(user);
+            UserHistory savecUserHistory = userHistoryRepository.save(userHistory);
+            log.info("user history saved with id: {}",savecUserHistory.getId());
+            userRepository.deleteById(actualUserId);
+        } else {
+            log.info("Processing refunding an amount of: {} to  user user with id:{}", refundSum,actualUserId);
+            user.setCredit(refundSum);
+            userRepository.save(user);
+            log.info("user successfully refunded");
+            UserHistory userHistory = UtilisateurMapper.utilisateurToUserHistory(user);
+            UserHistory savecUserHistory = userHistoryRepository.save(userHistory);
+            log.info("user history saved with id: {}",savecUserHistory.getId());
             userRepository.deleteById(actualUserId);
         }
-        log.info("Processing refunding an amount of: {} to  user user with id:{}", refundSum,actualUserId);
-        user.setCredit(refundSum);
-        userRepository.save(user);
-        log.info("user successfully refunded");
-        userRepository.deleteById(actualUserId);
+
 
          articlevenduServiceHelper.getArticleList().forEach(responseArticleVenduDto -> {
             List<ResponseEnchereDto> allEnchere = enchereService.findAllEnchere(responseArticleVenduDto.getId());

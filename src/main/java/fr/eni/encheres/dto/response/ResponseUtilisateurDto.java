@@ -21,6 +21,7 @@ public class ResponseUtilisateurDto {
     private String pseudo;
     private String nom;
     private String prenom;
+    private Integer credit;
     private String email;
     private String telephone;
     @Embedded
