@@ -49,12 +49,10 @@ public class EnchereServiceImpl implements EnchereService {
         int nouveauCredit = enchereServiceHelper.VerifyCredit(montantProposé, utilisateur, articleVendu);
         Enchere meilleureEnchere = enchereRepository.findFirstByArticleVenduOrderByMontantEnchereDesc(articleVendu);
         refundingVerification(meilleureEnchere,actualUserId,nouveauCredit);
-        if (utilisateur.getId() != meilleureEnchere.getUtilisateur().getId()) {
+        if ( meilleureEnchere==null ) {
             utilisateur.setCredit(nouveauCredit);
             userRepository.save(utilisateur);
         }
-
-
         saveEnchere(montantProposé, utilisateur, articleVendu);
     }
 
